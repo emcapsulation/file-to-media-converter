@@ -1,7 +1,6 @@
 from midiutil.MidiFile import MIDIFile
 import sys
 
-# Get the user's file
 f = open(sys.argv[1], "rb");
 
 # Create MIDI object with one track
@@ -25,12 +24,12 @@ while byte:
     # Do stuff with byte
     note = int.from_bytes(byte, byteorder="big")
 
-    if note >= 128:
+    if note >= 128:    
         duration = default_duration*2
         note = note%128
 
     mf.addNote(track, channel, note, time, duration, volume)
-    time += 0.25;
+    time += duration;
 
     byte = f.read(1)    
 
