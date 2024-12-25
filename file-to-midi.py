@@ -11,7 +11,7 @@ mf = MIDIFile(1)
 track = 0
 time = 0
 mf.addTrackName(track, time, sys.argv[1] + "-midi")
-mf.addTempo(track, time, 360)
+mf.addTempo(track, time, 1440)
 
 channel = 0
 volume = 100
@@ -24,7 +24,6 @@ while byte:
 
     # Do stuff with byte
     note = int.from_bytes(byte, byteorder="big")
-    print(note)
 
     if note >= 128:
         duration = default_duration*2
