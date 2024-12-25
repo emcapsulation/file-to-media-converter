@@ -3,7 +3,7 @@ import os
 from mido import MidiFile
 
 
-TICK_LENGTH = 120
+TICK_LENGTH = 240
 NUM_NOTES = 128
 
 
