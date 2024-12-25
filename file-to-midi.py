@@ -14,7 +14,7 @@ mf.addTempo(track, time, 1440)
 
 channel = 0
 volume = 100
-default_duration = 0.25
+default_duration = 0.125
 time = 0
 
 byte = f.read(1)

@@ -2,7 +2,7 @@ import sys
 from mido import MidiFile
 
 
-TICK_LENGTH = 240
+TICK_LENGTH = 120
 NUM_NOTES = 128
 
 
@@ -20,13 +20,12 @@ for track in midi.tracks:
 	for msg in track:
 		elapsed += msg.time
 
-		if msg.type == "note_on" or msg.type == "note_off":
-			if msg.type == "note_on":
-				start_time = elapsed
+		if msg.type == "note_on":
+			start_time = elapsed
 
-			elif msg.type == "note_off":
-				end_time = elapsed
-				byte = getByte(msg.note, end_time-start_time)
-				f.write(byte)
+		elif msg.type == "note_off":
+			end_time = elapsed
+			byte = getByte(msg.note, end_time-start_time)
+			f.write(byte)
 
 f.close()
