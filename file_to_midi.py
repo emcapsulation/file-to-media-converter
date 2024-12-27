@@ -70,7 +70,7 @@ def file_to_midi(filename, file_extension):
     track = 0
     channel = 0
     volume = 100
-    tempo = 1440
+    tempo = 60
     default_duration = 0.25
 
     # Create MIDI and encode file extension
