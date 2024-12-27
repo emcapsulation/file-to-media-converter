@@ -1,12 +1,9 @@
 # file-to-midi-converter
 Converts files to MIDI format and back.
 
-To convert a txt file to a MIDI file:
+To convert a file to a MIDI file or back:
 ```
-python3 file-to-midi.py <filename.txt>
+python3 main.py <filename>
 ```
 
-To convert a MIDI file back to a txt file:
-```
-python3 midi-to-file.py <filename.mid>
-```
+If <filename> is anything but a .mid file, it will convert it to a MIDI file. If <filename> is a .mid file it will convert it back to the original file type.
