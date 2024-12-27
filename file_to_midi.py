@@ -78,7 +78,7 @@ def file_to_midi(filename, file_extension):
     writeFileExtension(file_extension, mf)
 
     # Write the file as a MIDI
-    f = open(sys.argv[1], "rb");
+    f = open(filename+file_extension, "rb")
     byte = f.read(1)
     while byte:
         mf.writebByteToMidi(byte)
