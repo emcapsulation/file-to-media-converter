@@ -11,10 +11,10 @@ class ImageFile:
 
 		self.position = [0, 0]
 		self.pixel = [0, 0, 0]
-		self.pixInd = 0
+		self.pix_ind = 0
 
 
-	def incrementPosition(self):
+	def increment_position(self):
 		self.position[0] += 1
 		if self.position[0] >= self.dimensions[0]:
 			self.position[0] = 0
@@ -22,47 +22,47 @@ class ImageFile:
 
 		if self.position[1] >= self.dimensions[1]:
 			# Save the image, we ran out of space
-			self.completeImage()
+			self.complete_image()
 
 
 	def drawCompletedPixel(self):
-		if self.pixInd > 2:
+		if self.pix_ind > 2:
 			self.im.putpixel(tuple(self.position), tuple(self.pixel))
 
-			self.pixInd = 0
+			self.pix_ind = 0
 			self.pixel = [0, 0, 0]
-			self.incrementPosition()
+			self.increment_position()
 
 
-	def writeiByteToImage(self, i):
-		self.pixel[self.pixInd] = i
-		self.pixInd += 1
+	def write_i_byte_to_image(self, i):
+		self.pixel[self.pix_ind] = i
+		self.pix_ind += 1
 		self.drawCompletedPixel()
 
 
-	def writebByteToImage(self, b):
+	def write_b_byte_to_image(self, b):
 		i = int.from_bytes(b, byteorder="big")
-		self.writeiByteToImage(i)
+		self.write_i_byte_to_image(i)
 
 
-	def writeWordToImage(self, word):
+	def write_word_to_image(self, word):
 		for c in word:
-			self.writeiByteToImage(ord(c))
+			self.write_i_byte_to_image(ord(c))
 		
 
-	def completeImage(self):
+	def complete_image(self):
 		self.im.putpixel(tuple(self.position), tuple(self.pixel))
 		self.im.save(self.filename + ".png")
 
 
 
-def writeFileExtension(file_extension, im):
+def write_file_extension(file_extension, im):
 	# Write the file extension length
     ext_length = str(len(file_extension))
-    im.writeiByteToImage(ord(ext_length))
+    im.write_i_byte_to_image(ord(ext_length))
 
     # Write the file extension
-    im.writeWordToImage(file_extension)
+    im.write_word_to_image(file_extension)
 
 
 
@@ -70,16 +70,16 @@ def file_to_image(filename, file_extension):
 	dimensions = [1280, 720]
 	im = ImageFile(filename, dimensions)
 
-	writeFileExtension(file_extension, im)
+	write_file_extension(file_extension, im)
 
 	# Write the file as a MIDI
 	f = open(filename+file_extension, "rb")
 	byte = f.read(1)
 	while byte:
-		im.writebByteToImage(byte)
+		im.write_b_byte_to_image(byte)
 		byte = f.read(1)
 
 	f.close()
 
 	# Write it to disk
-	im.completeImage()
+	im.complete_image()

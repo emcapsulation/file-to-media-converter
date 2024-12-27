@@ -1,9 +1,14 @@
-# file-to-midi-converter
+# file-to-media-converter
 Converts files to MIDI format and back.
 
-To convert a file to a MIDI file or back:
+To convert a file to a different type:
+```
+python3 main.py <filename> <target extension>
+```
+<target extension> = mid | png
+
+To convert back:
 ```
 python3 main.py <filename>
 ```
-
-If <filename> is anything but a .mid file, it will convert it to a MIDI file. If <filename> is a .mid file it will convert it back to the original file type.
+Where filename is .mid or .png.

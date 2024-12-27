@@ -15,12 +15,12 @@ class MidiTrack:
 		self.elapsed = 0
 
 
-	def getByteFromNote(self, note, duration):
+	def get_byte_from_note(self, note, duration):
 		val = self.NUM_NOTES*(int(duration/self.TICK_LENGTH)-1) + note
 		return val.to_bytes(1, "big")
 
 
-	def getMsg(self, start_time):
+	def get_msg(self, start_time):
 		msg = self.track[self.index]
 		self.elapsed += msg.time
 		byte = None
@@ -29,21 +29,21 @@ class MidiTrack:
 			start_time = self.elapsed
 
 		elif msg.type == "note_off":
-			byte = self.getByteFromNote(msg.note, self.elapsed-start_time)
+			byte = self.get_byte_from_note(msg.note, self.elapsed-start_time)
 
 		self.index += 1
 
 		return start_time, byte
 
 
-	def readnNotes(self, n):
+	def read_n_notes(self, n):
 		i = 0
 		start_time = 0
 		res = ""
 
 		while i < n:
 			msg = self.track[self.index]
-			start_time, byte = self.getMsg(start_time)
+			start_time, byte = self.get_msg(start_time)
 
 			if byte != None:
 				res += byte.decode('utf-8')
@@ -52,13 +52,13 @@ class MidiTrack:
 		return res
 
 
-	def writenNotes(self, f, n):
+	def write_n_notes(self, f, n):
 		i = 0
 		start_time = 0
 
 		while i < n and self.index < self.track_len:
 			msg = self.track[self.index]
-			start_time, byte = self.getMsg(start_time)
+			start_time, byte = self.get_msg(start_time)
 
 			if byte != None:
 				f.write(byte)
@@ -70,9 +70,9 @@ def midi_to_file(filename, midi_extension):
 	track = MidiTrack(midi.tracks[1])
 
 	# Get the file extension
-	ext_len = track.readnNotes(1)
-	file_extension = track.readnNotes(int(ext_len))
+	ext_len = track.read_n_notes(1)
+	file_extension = track.read_n_notes(int(ext_len))
 
 	f = open(filename + file_extension, "wb")
-	track.writenNotes(f, track.track_len-track.index-1)
+	track.write_n_notes(f, track.track_len-track.index-1)
 	f.close()
