@@ -3,56 +3,76 @@ import os
 from mido import MidiFile
 
 
-TICK_LENGTH = 240
-NUM_NOTES = 128
+
+class MidiTrack:
+	TICK_LENGTH = 240
+	NUM_NOTES = 128
+
+	def __init__(self, track):
+		self.track = track
+		self.track_len = len(track)
+		self.index = 0
+		self.elapsed = 0
 
 
-filename, midi_ext = os.path.splitext(sys.argv[1])
+	def getByteFromNote(self, note, duration):
+		val = self.NUM_NOTES*(int(duration/self.TICK_LENGTH)-1) + note
+		return val.to_bytes(1, "big")
 
 
-def getByteFromNote(note, duration):
-	val = NUM_NOTES*(int(duration/TICK_LENGTH)-1) + note
-	return val.to_bytes(1, "big")
-
-
-midi = MidiFile(sys.argv[1])
-
-track = midi.tracks[1]
-elapsed, start_time, end_time = 0, 0, 0
-
-
-# Get the file extension
-file_extension = ""
-if track[2].type == "note_off":
-	elapsed += track[2].time
-	b_ext_len = getByteFromNote(track[2].note, track[2].time)
-	ext_len = int.from_bytes(b_ext_len, byteorder="big")-48
-
-	for i in range(0, ext_len*2):
-		msg = track[2+i+1]
-		elapsed += msg.time
+	def getMsg(self, start_time):
+		msg = self.track[self.index]
+		self.elapsed += msg.time
+		byte = None
 
 		if msg.type == "note_on":
-			start_time = elapsed
+			start_time = self.elapsed
 
 		elif msg.type == "note_off":
-			end_time = elapsed
-			byte = getByteFromNote(msg.note, end_time-start_time)
-			file_extension += byte.decode('utf-8')
+			byte = self.getByteFromNote(msg.note, self.elapsed-start_time)
 
-f = open(filename + file_extension, "wb")
+		self.index += 1
+
+		return start_time, byte
 
 
-for i in range(ext_len*2 + 3, len(track)):
-	msg = track[i]
-	elapsed += msg.time
+	def readnNotes(self, n):
+		i = 0
+		start_time = 0
+		res = ""
 
-	if msg.type == "note_on":
-		start_time = elapsed
+		while i < n:
+			msg = self.track[self.index]
+			start_time, byte = self.getMsg(start_time)
 
-	elif msg.type == "note_off":
-		end_time = elapsed
-		byte = getByteFromNote(msg.note, end_time-start_time)
-		f.write(byte)
+			if byte != None:
+				res += byte.decode('utf-8')
+				i += 1
 
-f.close()
+		return res
+
+
+	def writenNotes(self, f, n):
+		i = 0
+		start_time = 0
+
+		while i < n and self.index < self.track_len:
+			msg = self.track[self.index]
+			start_time, byte = self.getMsg(start_time)
+
+			if byte != None:
+				f.write(byte)
+				i += 1
+
+
+def midi_to_file(filename, midi_extension):
+	midi = MidiFile(filename+midi_extension)
+	track = MidiTrack(midi.tracks[1])
+
+	# Get the file extension
+	ext_len = track.readnNotes(1)
+	file_extension = track.readnNotes(int(ext_len))
+
+	f = open(filename + file_extension, "wb")
+	track.writenNotes(f, track.track_len-track.index-1)
+	f.close()
